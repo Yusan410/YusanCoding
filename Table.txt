@@ -1,0 +1,386 @@
+package control;
+
+import gifBuilder.ScreenShot;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import session.Session;
+import utils.Level;
+import utils.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Table extends ControlBase {
+
+    private static final String TR="tr";
+    private static final String TD="td";
+    private static final String TH="th";
+    private static final String THEAD="thead";
+    private static final String TBODY="tbody";
+
+
+    public Table(By locator) {
+        super(locator);
+    }
+
+
+    public int getPositionColumn(String value) throws Exception {
+        this.findControl();
+        int position=0;
+        WebElement thead= this.control.findElement(By.tagName(THEAD));
+
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        Logger.log(Level.INFO,this.getClass().getName()+"> size on row in table "+rowsList.size() +" "+this.getClass().getSimpleName());
+        for (WebElement row: rowsList) {
+            List<WebElement> columnList = row.findElements(By.tagName(TH));
+            Logger.log(Level.INFO,this.getClass().getName()+"> values on column list: "+columnList.size()+" - "+this.getClass().getSimpleName());
+            for (WebElement column : columnList) {
+                String cellValue=column.getText();
+                position++;
+                Logger.log(Level.INFO,this.getClass().getName()+"value "+position+"  value cell: "+cellValue+" - "+this.getClass().getSimpleName());
+                if (cellValue.equals(value))
+                    return position;
+            }
+            position=0;
+        }
+        return position;
+    }
+
+    public int getPositionRow(String value) throws Exception {
+        this.findControl();
+        int rowPosition=0;
+        WebElement thead= this.control.findElement(By.tagName(TBODY));
+
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        Logger.log(Level.INFO,this.getClass().getName()+"> size on row in table "+rowsList.size() +" "+this.getClass().getSimpleName());
+        for (WebElement row: rowsList) {
+            List<WebElement> columnList = row.findElements(By.tagName(TD));
+            rowPosition++;
+            Logger.log(Level.INFO,this.getClass().getName()+"> values on column list: "+columnList.size()+" - "+this.getClass().getSimpleName());
+            for (WebElement column : columnList) {
+                String cellValue=column.getText();
+                 Logger.log(Level.INFO,this.getClass().getName()+" row position: "+rowPosition+"value cell: "+cellValue+" - "+this.getClass().getSimpleName());
+                if (cellValue.equals(value) || cellValue.contains(value))
+                    return rowPosition;
+            }
+        }
+        return rowPosition;
+    }
+
+    public void setTextXpath(String nameColumn,int rowNumber, String value) throws Exception {
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+rowNumber+"]/td["+getPositionColumn(nameColumn)+"]/input";
+        TextBox cellTextBox = new TextBox(By.xpath(buildLocator));
+        cellTextBox.clearSetText(value);
+    }
+
+    public void setText(int column, int row , String value) throws Exception {
+        Logger.log(Level.INFO,this.getClass().getName()+"> Set Text on Table column:["+column+"], row:["+row+"] with the value:["+value+"] "+this.getClass().getSimpleName());
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+row+"]/td["+column+"]/input";
+        TextBox cellTextBox = new TextBox(By.xpath(buildLocator));
+        cellTextBox.clearSetText(value);
+    }
+
+    public void setTextSelect(int column, int row , String initialValue, String finalValue) throws Exception {
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+row+"]/td["+column+"]/input";
+        TextBox cellTextBox = new TextBox(By.xpath(buildLocator));
+        cellTextBox.selectTextOption(initialValue,finalValue);
+    }
+
+    public void clickLink(int column, int row) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> Click on cell control ["+locator+"] "+this.getClass().getSimpleName());
+        this.findControl();
+        WebElement cell = this.control.findElement(By.xpath("//tbody/tr["+row+"]/td["+column+"]/a"));
+        ((JavascriptExecutor) Session.getInstance().getDriver()).executeScript("arguments[0].scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });", cell);
+        cell.click();
+        ScreenShot.addScreen(this.getClass().getName()+"> Click on cell control ["+locator+"] "+this.getClass().getSimpleName());
+    }
+
+    public void clickButton(int column, int row) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Click on cell control [" + locator + "] " + this.getClass().getSimpleName());
+        this.findControl();
+        WebElement cell = this.control.findElement(By.xpath("//tbody/tr[" + row + "]/td[" + column + "]/button"));
+        cell.click();
+        ScreenShot.addScreen(this.getClass().getName() + "> Click on cell control [" + locator + "] " + this.getClass().getSimpleName());
+    }
+
+    public void clickLinkXpath(int column, int row) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> Click on link on cell control ["+locator+"] "+this.getClass().getSimpleName());
+        WebElement cell =  Session.getInstance().getDriver().findElement(By.xpath(this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+row+"]/td["+column+"]/a"));
+        cell.click();
+        ScreenShot.addScreen(this.getClass().getName()+"> Click on link on cell control ["+locator+"] "+this.getClass().getSimpleName());
+    }
+
+    public void clickLink(String nameColumn, int row) throws Exception {
+        WebElement cell = Session.getInstance().getDriver().findElement(this.locator)
+                .findElement(By.xpath(this.getLocatorXpathString()+"//tr["+row+"]/td["+getPositionColumn(nameColumn)+"]/a"));
+        cell.click();
+    }
+
+
+    public List<String> getAllHeaderLabel() throws Exception {
+        this.findControl();
+        List<String>headerLabels= new ArrayList<>();
+        WebElement thead= this.control.findElement(By.tagName(THEAD));
+
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        List<WebElement> columnList = rowsList.get(0).findElements(By.tagName(TH));
+        for (WebElement column : columnList) {
+            headerLabels.add(column.getText());
+        }
+
+        return headerLabels;
+    }
+    public List<String> getEntireColumn(String columnName) throws Exception{
+        this.findControl();
+        if (!this.getAllHeaderLabel().contains(columnName)){
+            throw new Exception ("There is no column with that name.");
+        }
+        List<String>columnItems= new ArrayList<>();
+        for (int i=1;i<=this.getRowCount();i++){
+            columnItems.add(this.getValueCell(this.getPositionColumn(columnName),i));
+        }
+        return columnItems;
+    }
+
+    public boolean verifyAllHeaderLabel(List<String> expectedHeadersLabels) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> Verify all labels in the table "+this.getClass().getSimpleName());
+        this.findControl();
+        List<String>actualHeadersLabels= new ArrayList<>();
+        WebElement thead= this.control.findElement(By.tagName(THEAD));
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        List<WebElement> columnList = rowsList.get(0).findElements(By.tagName(TH));
+        for (WebElement column : columnList) {
+            actualHeadersLabels.add(column.getText());
+        }
+        Logger.log(Level.INFO,this.getClass().getName()+"> All Headers:  ["+actualHeadersLabels.toString()+"] "+this.getClass().getSimpleName());
+
+        boolean areAllLabel=true;
+        for (String label:expectedHeadersLabels) {
+            if(!actualHeadersLabels.stream().anyMatch(str -> str.equals(label))){
+                areAllLabel=false;
+            }
+        }
+        ScreenShot.addScreen(this.getClass().getName()+"> Verify all labels in the table "+this.getClass().getSimpleName());
+       return areAllLabel;
+    }
+
+    public void select(int column, int row, String value) throws Exception {
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+row+"]/td["+column+"]/select";
+        Select cellSelect = new Select(By.xpath(buildLocator));
+        cellSelect.selectValue(value);
+    }
+
+    public synchronized void selectFirstValue(int column, int row) throws Exception {
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+row+"]/td["+column+"]/select";
+        Select cellSelect = new Select(By.xpath(buildLocator));
+        cellSelect.firstValue();
+    }
+
+    public boolean checkIfValueIsDisplayedInTable(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> check if value is displayed in the table ["+value+"]"+this.getClass().getSimpleName());
+        this.findControl();
+        WebElement thead= this.control.findElement(By.tagName(TBODY));
+
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+
+        for (WebElement row: rowsList) {
+            List<WebElement> columnList = row.findElements(By.tagName(TD));
+            for (WebElement column : columnList) {
+                String cellValue=column.getText();
+                 if (cellValue.equals(value) ||cellValue.contains(value )){
+                    ScreenShot.addScreen(this.getClass().getName()+"> check if value is displayed in the table ["+value+"]"+this.getClass().getSimpleName());
+                    return true;
+                }
+            }
+        }
+        ScreenShot.addScreen(this.getClass().getName()+"> check if value is displayed in the table ["+value+"]"+this.getClass().getSimpleName());
+        return false;
+    }
+
+    public void clickOnCheckBoxCell(int column, int row) throws Exception {
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+row+"]/td["+column+"]/input";
+        Checkbox cellSelect = new Checkbox(By.xpath(buildLocator));
+        cellSelect.click();
+    }
+
+    public void actionCheckBoxCell(int column, int row,String action) throws Exception {
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+row+"]/td["+column+"]/input";
+        Checkbox cellSelect = new Checkbox(By.xpath(buildLocator));
+        cellSelect.actionCheckBox(action);
+    }
+    public void clickOnLinkCell(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+        this.findControl();
+        boolean isClicked=false;
+        WebElement thead= this.control.findElement(By.tagName(TBODY));
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        for (WebElement row: rowsList) {
+            List<WebElement> columnList = row.findElements(By.tagName(TD));
+            for (WebElement column : columnList) {
+                String cellValue=column.getText();
+                if (cellValue.equals(value)){
+                    column.findElement(By.tagName("a")).click();
+                    ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+                    isClicked=true;
+                    break;
+                }
+            }
+            if (isClicked)
+                break;
+        }
+        if (!isClicked)
+            throw new Exception("The Cell ["+value+"] was not found in the table in order to do click action");
+
+        ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+    }
+    public void clickOnLinkCellContains(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+        this.findControl();
+        boolean isClicked=false;
+        WebElement thead= this.control.findElement(By.tagName(TBODY));
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        for (WebElement row: rowsList) {
+            List<WebElement> columnList = row.findElements(By.tagName(TD));
+            for (WebElement column : columnList) {
+                String cellValue=column.getText();
+                if (cellValue.contains(value)){
+                    column.findElement(By.tagName("a")).click();
+                    ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+                    isClicked=true;
+                    break;
+                }
+            }
+            if (isClicked)
+                break;
+        }
+        if (!isClicked)
+            throw new Exception("The Cell ["+value+"] was not found in the table in order to do click action");
+
+        ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+    }
+    public void clickOnLinkCellWithoutAnchor(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+        this.findControl();
+        boolean isClicked=false;
+        WebElement thead= this.control.findElement(By.tagName(TBODY));
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        for (WebElement row: rowsList) {
+            List<WebElement> columnList = row.findElements(By.tagName(TD));
+            for (WebElement column : columnList) {
+                String cellValue=column.getText();
+                if (cellValue.equals(value)){
+                    column.click();
+                    ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+                    isClicked=true;
+                    break;
+                }
+            }
+            if (isClicked)
+                break;
+        }
+        if (!isClicked)
+            throw new Exception("The Cell ["+value+"] was not found in the table in order to do click action");
+
+        ScreenShot.addScreen(this.getClass().getName()+"> click on cell  ["+value+"] in the table :"+this.getClass().getSimpleName());
+    }
+
+    /**
+     * this method is to get all the table values in a list of list , except the headers
+     * @return
+     * @throws Exception
+     */
+    public List<List<String>>  getTableValue() throws Exception {
+        this.findControl();
+        WebElement thead= this.control.findElement(By.tagName(TBODY));
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+        List<List<String>> table =  new ArrayList<>();
+        for (WebElement row: rowsList) {
+            List<WebElement> columnList = row.findElements(By.tagName(TD));
+            List<String> rowValues = new ArrayList<>();
+            for (WebElement column : columnList) {
+               rowValues.add(column.getText());
+            }
+            table.add(rowValues);
+        }
+
+       return table;
+    }
+
+    /*
+    * this method is for special tables -several tbody
+      <tbody>
+      </tbody>
+       <tbody>
+      </tbody>
+    * */
+
+    public List<List<String>>  getTableSpecialsValue() throws Exception {
+        this.findControl();
+        List<WebElement> tbodyList= this.control.findElements(By.tagName(TBODY));
+        List<List<String>> table =  new ArrayList<>();
+        for (WebElement tbody: tbodyList) {
+            List<WebElement> rowsList = tbody.findElements(By.tagName(TR));
+            for (WebElement row: rowsList ) {
+                List<WebElement> columnList = row.findElements(By.tagName(TD));
+                List<String> rowValues = new ArrayList<>();
+                for (WebElement column : columnList) {
+                    rowValues.add(column.getText());
+                }
+                table.add(rowValues);
+            }
+
+        }
+
+        return table;
+    }
+    public int getRowCount() throws Exception {
+        this.findControl();
+        int rowCount=0;
+        WebElement tbody= this.control.findElement(By.tagName(TBODY));
+        List<WebElement> rowsList = tbody.findElements(By.tagName(TR));
+        for (WebElement row: rowsList) {
+            rowCount++;
+        }
+        return rowCount;
+    }
+
+    public String getValueCell(int positionColumn, int positionRow) throws Exception {
+        String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+positionRow+"]/td["+positionColumn+"]";
+        Label label = new Label(By.xpath(buildLocator));
+        return label.getText();
+    }
+
+    public void selectDropdownValueIfValueIsDisplayedInTable(String value, String templateName) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName()+"> check if value is displayed in the table ["+value+"]"+this.getClass().getSimpleName());
+        int rowCount=0, columnCount=1;
+        this.findControl();
+        WebElement thead= this.control.findElement(By.tagName(TBODY));
+        List<WebElement> rowsList = thead.findElements(By.tagName(TR));
+     outerLoop:   for (WebElement row: rowsList) {
+         ++rowCount;
+            List<WebElement> columnList = row.findElements(By.tagName(TD));
+ innerLoop :   for (WebElement column : columnList) {
+                String cellValue=column.getText();
+                 if (cellValue.equalsIgnoreCase(value)){
+                    ScreenShot.addScreen(this.getClass().getName()+"> check if value is displayed in the table ["+value+"]"+this.getClass().getSimpleName());
+                    String buildLocator=this.locator.toString().replace("By.xpath: ","")+"//tbody/tr["+rowCount+"]/td["+ ++columnCount +"]/select";
+                    Select cellSelect = new Select(By.xpath(buildLocator));
+                    cellSelect.selectValueContainsOption(templateName);
+                    break innerLoop;
+                }
+                ++columnCount;
+        if( rowsList.size()==rowCount)
+            break outerLoop;
+            }
+            columnCount=1;
+        }
+        ScreenShot.addScreen(this.getClass().getName()+"> check if value is displayed in the table ["+value+"]"+this.getClass().getSimpleName());
+    }
+
+    public void clickLinkJoinXpath(String nameColumn, int row, String xpathLink) throws Exception {
+        WebElement cell = Session.getInstance().getDriver().findElement(this.locator)
+                .findElement(By.xpath("//tr["+row+"]/td["+getPositionColumn(nameColumn)+"]"+xpathLink));
+        cell.click();
+    }
+}
