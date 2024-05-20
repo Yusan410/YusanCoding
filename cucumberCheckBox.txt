@@ -1,0 +1,50 @@
+package control;
+
+import gifBuilder.ScreenShot;
+import org.openqa.selenium.By;
+import utils.Level;
+import utils.Logger;
+
+
+public class Checkbox extends ControlBase {
+    public Checkbox(By locator) {
+        super(locator);
+    }
+
+    public void check() throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Check on [" + this.locator + "] " + this.getClass().getSimpleName());
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Check on [" + this.locator + "] " + this.getClass().getSimpleName());
+        if (!this.control.isSelected()) {
+            this.control.click();
+        }
+        ScreenShot.addScreen(this.getClass().getName() + "> Check on [" + this.locator + "] " + this.getClass().getSimpleName());
+    }
+
+    public void uncheck() throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Uncheck on [" + this.locator + "] " + this.getClass().getSimpleName());
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Uncheck on [" + this.locator + "] " + this.getClass().getSimpleName());
+        if (this.control.isSelected()) {
+            this.control.click();
+        }
+        ScreenShot.addScreen(this.getClass().getName() + "> Uncheck on [" + this.locator + "] " + this.getClass().getSimpleName());
+    }
+
+
+    public void actionCheckBox(String action) throws Exception {
+        if (action.toLowerCase().contains("uncheck")) {
+            this.uncheck();
+        } else if (action.toLowerCase().equals("check")) {
+            this.check();
+        } else {
+            throw new Exception("ERROR: the action: [" + action + "] is not supported for control: checkbox, please just user: check or uncheck");
+        }
+    }
+
+    public boolean isChecked() throws Exception {
+        this.findControl();
+        boolean isControlSelected = this.control.isSelected();
+        return isControlSelected;
+    }
+}
