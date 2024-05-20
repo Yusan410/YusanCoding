@@ -1,0 +1,30 @@
+package control;
+
+import gifBuilder.ScreenShot;
+import org.openqa.selenium.By;
+import utils.Level;
+import utils.Logger;
+
+public class CustomSelectSpan extends Select {
+    private String optionLabel;
+    private TextBox searchTextBox;
+
+    public CustomSelectSpan(By locator, String optionLabel, By locatorSearch) {
+        super(locator);
+        this.optionLabel = optionLabel;
+        this.searchTextBox = new TextBox(locatorSearch);
+    }
+
+    public void setAndselectValue(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.control.click();
+        this.searchTextBox.setText(value);
+        Thread.sleep(2000);
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        Label option = new Label(By.xpath("//" + optionLabel + "[text()='" + value + "']"));
+        option.click();
+        Thread.sleep(1000);
+    }
+}
