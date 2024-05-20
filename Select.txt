@@ -1,0 +1,135 @@
+package control;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import session.Session;
+import utils.Level;
+import utils.Logger;
+import java.util.List;
+
+public class Select extends ControlBase {
+    public Select(By locator) {
+        super(locator);
+    }
+
+    public void selectValue(String value) throws Exception {
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the value: [" + value + "] on control [" + locator + "] " + this.getClass().getSimpleName());
+        Thread.sleep(1000);
+        this.click();
+
+        Label option = new Label(By.xpath("//option[text()='" + value + "']"));
+        Thread.sleep(1000);
+        option.click();
+        Thread.sleep(1000);
+    }
+
+    public void selectValueContainsOption(String value) throws Exception {
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the value: [" + value + "] on control [" + locator + "] " + this.getClass().getSimpleName());
+        Thread.sleep(1000);
+        this.click();
+
+        Label option = new Label(By.xpath("//option[contains(text(),'" + value + "')]"));
+        Thread.sleep(1000);
+        option.click();
+        Thread.sleep(1000);
+
+    }
+
+    public void selectValueContainsOptionSpan(String value) throws Exception {
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the value: [" + value + "] on control [" + locator + "] " + this.getClass().getSimpleName());
+        Thread.sleep(1000);
+        this.click();
+        Label option = new Label(By.xpath("//option/span[contains(text(),'" + value + "')]"));
+        Thread.sleep(1000);
+        option.click();
+        Thread.sleep(1000);
+    }
+
+    /*this method is to setup directly a value in a Select object*/
+    public void selectValueWithJavaScriptOptionSpan(String value) throws Exception {
+        this.findControl();
+        Label option = new Label(By.xpath("//option/span[contains(text(),'" + value + "')]/parent::option"));
+        String idValue = option.getTextAttribute("value");
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the value: [" + value + "] on control [" + locator + "] " + this.getClass().getSimpleName());
+        JavascriptExecutor jse = (JavascriptExecutor) Session.getInstance().getDriver();
+        jse.executeScript("arguments[0].value = '"+idValue+"';",this.control);
+        this.control.sendKeys(Keys.ARROW_UP);
+        this.control.sendKeys(Keys.ARROW_DOWN);
+        this.control.sendKeys(Keys.ENTER);
+        Thread.sleep(1000);
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the value: [" + value + "] with ["+idValue+"] on control [" + locator + "] " + this.getClass().getSimpleName());
+        Thread.sleep(1000);
+
+
+    }
+
+    public void selectValueUsingXpath(String value) throws Exception {
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the value: [" + value + "] on control [" + locator + "] " + this.getClass().getSimpleName());
+        this.findControl();
+        Thread.sleep(1000);
+        this.click();
+        Label option = new Label(By.xpath(this.getLocatorXpathString() + "/option[text()='" + value + "']"));
+        Thread.sleep(1000);
+        option.click();
+        Thread.sleep(1000);
+    }
+
+    public void selectContainsValueUsingXpath(String value) throws Exception {
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the value: [" + value + "] on control [" + locator + "] " + this.getClass().getSimpleName());
+        this.findControl();
+        Thread.sleep(1000);
+        this.click();
+        Label option = new Label(By.xpath(this.getLocatorXpathString() + "/option[contains(text(),'" + value + "')]"));
+        Thread.sleep(1000);
+        option.click();
+        Thread.sleep(1000);
+    }
+
+    public void firstValue() throws Exception {
+        Thread.sleep(1000);
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select the first value on control [" + locator + "] " + this.getClass().getSimpleName());
+        this.click();
+        Thread.sleep(1000);
+        List<WebElement> optionList = this.control.findElements(By.tagName("option"));
+        optionList.get(1).click();
+    }
+
+    public String getTextOptionSelected() throws Exception {
+        String customLocator = this.getLocatorXpathString() + "//option[@selected='selected']";
+        Label value = new Label(By.xpath(customLocator));
+        return value.getText();
+    }
+
+
+    public String getTextOptionDisable() throws Exception {
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Get text on disable control [" + locator + "] " + this.getClass().getSimpleName());
+        String idValueSelected = this.control.getAttribute("value");
+        Label value = new Label(By.xpath(this.getLocatorXpathString() + "/option[@value='" + idValueSelected + "']"));
+        Logger.log(Level.INFO, this.getClass().getName() + "> Get text on disable control [" + locator + "] " + this.getClass().getSimpleName() + " text value: [" + value.getText() + "]");
+        return value.getText();
+    }
+    public String getAllValuesCommaSeparated() throws Exception {
+        Thread.sleep(1000);
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Select all values on control [" + locator + "] " + this.getClass().getSimpleName());
+        this.click();
+        Thread.sleep(1000);
+        List<WebElement> optionList = this.control.findElements(By.tagName("option"));
+        int iSize = optionList.size();
+        StringBuilder sValues = new StringBuilder("");
+        for (int iCtr=0;iCtr<=iSize-1;iCtr++){
+            if (iCtr < iSize-1)
+                sValues.append(optionList.get(iCtr).getText()).append(",");
+            else
+                sValues.append(optionList.get(iCtr).getText());
+        }
+        return sValues.toString();
+    }
+}
