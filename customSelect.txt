@@ -1,0 +1,76 @@
+package control;
+
+import gifBuilder.ScreenShot;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import utils.Level;
+import utils.Logger;
+
+public class CustomSelect extends Select {
+    private String optionLabel;
+
+    public CustomSelect(By locator, String optionLabel) {
+        super(locator);
+        this.optionLabel = optionLabel;
+
+    }
+
+    public void setAndselectValue(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.control.sendKeys(value);
+        Thread.sleep(2000);
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        Label option = new Label(By.xpath("//" + optionLabel + "[text()='" + value + "']"));
+        option.click();
+        Thread.sleep(2000);
+        Logger.log(Level.INFO, this.getClass().getName() + "> Send on [" + this.locator + "] " + this.getClass().getSimpleName() + " the action TAB");
+        this.control.sendKeys(Keys.TAB);
+        Thread.sleep(1000);
+    }
+
+    public void setAndSelectContainsValue(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.control.sendKeys(value);
+        Thread.sleep(2000);
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        Label option = new Label(By.xpath("//" + optionLabel + "[contains(text(),'" + value + "')]"));
+        option.click();
+        Thread.sleep(2000);
+        Logger.log(Level.INFO, this.getClass().getName() + "> Send on [" + this.locator + "] " + this.getClass().getSimpleName() + " the action TAB");
+        this.control.sendKeys(Keys.TAB);
+        Thread.sleep(1000);
+    }
+
+    public void setAndClickValue(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.control.sendKeys(value);
+        Thread.sleep(2500);
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "] " + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        Label option = new Label(By.xpath("//" + optionLabel + "[text()='" + value + "']"));
+        option.click();
+
+    }
+
+    public void clickAndSelectValue(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Click on [" + this.locator + "] " + this.getClass().getSimpleName());
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Click on [" + this.locator + "] " + this.getClass().getSimpleName());
+        this.control.click();
+        Thread.sleep(2000);
+        Label option = new Label(By.xpath("//" + optionLabel + "[text()='" + value + "']"));
+        option.click();
+        Thread.sleep(2000);
+        ScreenShot.addScreen(this.getClass().getName() + "> Click on [" + this.locator + "] " + this.getClass().getSimpleName());
+    }
+
+    public void clear() throws Exception {
+        this.findControl();
+        this.control.clear();
+    }
+}
