@@ -1,0 +1,92 @@
+package control;
+
+import gifBuilder.ScreenShot;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import session.Session;
+import utils.Level;
+import utils.Logger;
+
+public class TextBox extends ControlBase {
+
+
+    public TextBox(By locator) {
+        super(locator);
+    }
+
+    public void setText(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        if (!value.equals(""))
+            this.control.sendKeys(value);
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "]");
+    }
+
+    public void setTextAndTab(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] + tab action");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] + tab action");
+        this.control.sendKeys(value + Keys.TAB);
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] + tab action");
+    }
+
+    public void setTextAndEnter(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] + enter action");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] + enter action");
+        this.control.sendKeys(value + Keys.ENTER);
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] + enter action");
+    }
+
+    public void clearSetText(String value) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Clear and Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] ");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Clear and Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] ");
+        this.control.clear();
+        this.control.sendKeys(value);
+        ScreenShot.addScreen(this.getClass().getName() + "> Clear and Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "] ");
+    }
+
+    public synchronized void selectTextOption(String initialLetterOption, String finalOption) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Custom Select Option on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + finalOption + "]");
+        this.findControl();
+        Thread.sleep(1000);
+        Logger.log(Level.INFO, this.getClass().getName() + "> Custom Select Option on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + finalOption + "]");
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + initialLetterOption + "]");
+        this.controlIsDisplayed(5);
+        this.controlIsClickable();
+        this.control.sendKeys(initialLetterOption);
+        Logger.log(Level.INFO, this.getClass().getName() + "> Click on [" + this.locator + "]" + this.getClass().getSimpleName());
+        Thread.sleep(3000);
+        ScreenShot.addScreen(this.getClass().getName() + "> Custom Select Option on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + finalOption + "]");
+        Label option = new Label(By.xpath("//li/a[contains(.,'" + finalOption + "')]"));
+        option.controlIsDisplayed(10);
+        option.controlIsClickable();
+        Thread.sleep(1000);
+        option.click();
+    }
+
+    public void clear() throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Clear on [" + this.locator + "]" + this.getClass().getSimpleName());
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Clear on [" + this.locator + "]" + this.getClass().getSimpleName());
+        this.control.clear();
+        ScreenShot.addScreen(this.getClass().getName() + "> Clear on [" + this.locator + "]" + this.getClass().getSimpleName());
+    }
+
+    public void clearSetTextJS(String value,String locatorValue) throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        this.findControl();
+        Logger.log(Level.INFO, this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "]");
+        if (!value.equals("")) {
+            this.control.clear();
+            JavascriptExecutor js = (JavascriptExecutor) Session.getInstance().getDriver();
+            WebElement element = Session.getInstance().getDriver().findElement(By.xpath(locatorValue));
+            js.executeScript("arguments[0].value='"+value+"'", element);
+        }
+        ScreenShot.addScreen(this.getClass().getName() + "> Set on [" + this.locator + "]" + this.getClass().getSimpleName() + " the value: [" + value + "]");
+    }
+}
