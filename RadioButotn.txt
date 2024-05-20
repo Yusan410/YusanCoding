@@ -1,0 +1,51 @@
+package control;
+
+import gifBuilder.ScreenShot;
+import org.openqa.selenium.By;
+import utils.Level;
+import utils.Logger;
+
+public class RadioButton extends ControlBase {
+
+    public RadioButton(By locator) {
+        super(locator);
+    }
+
+    public void select() throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> locator [" + locator + "] the control was selected, click action");
+        this.findControl();
+        boolean isSelected = false;
+        try {
+            isSelected = Boolean.parseBoolean(this.control.getAttribute("checked"));
+        } catch (NullPointerException exception) {
+            isSelected = false;
+        } catch (Exception e) {
+            isSelected = false;
+        }
+
+
+        if (!isSelected) {
+            Logger.log(Level.INFO, this.getClass().getName() + "> locator [" + locator + "] the control was selected, click action");
+            this.click();
+        }
+        ScreenShot.addScreen(this.getClass().getName() + "> locator [" + locator + "] the control was selected, click action");
+    }
+
+    public void unselect() throws Exception {
+        ScreenShot.addScreen(this.getClass().getName() + "> locator [" + locator + "] the control was unselected, click action");
+        this.findControl();
+        boolean isSelected = false;
+        try {
+            isSelected = Boolean.parseBoolean(this.control.getAttribute("checked"));
+        } catch (NullPointerException exception) {
+            isSelected = false;
+        }
+        Logger.log(Level.INFO, this.getClass().getName() + "> locator [" + locator + "] select the control");
+        if (isSelected) {
+            Logger.log(Level.INFO, this.getClass().getName() + "> locator [" + locator + "] the control was unselected, click action");
+            this.click();
+        }
+        ScreenShot.addScreen(this.getClass().getName() + "> locator [" + locator + "] the control was unselected, click action");
+    }
+
+}
