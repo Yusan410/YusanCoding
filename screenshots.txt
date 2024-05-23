@@ -1,0 +1,24 @@
+package gifBuilder;
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import session.Session;
+
+public class ScreenShot {
+
+    public static GifAssembler gifAssembler = new GifAssembler();
+
+    public static synchronized void addScreen(String description) {
+        try {
+            byte[] screenshot = ((TakesScreenshot) Session.getInstance().getDriver())
+                    .getScreenshotAs(OutputType.BYTES);
+            if (screenshot.length > 0) {
+                gifAssembler.addFrame(description, screenshot);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+
+}
